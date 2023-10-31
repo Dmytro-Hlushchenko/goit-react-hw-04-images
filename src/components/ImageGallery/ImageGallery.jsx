@@ -1,5 +1,5 @@
 
-import ImageGalleryItem from "components/ImageGalleryItem"
+import { ImageGalleryItem } from "components/ImageGalleryItem"
 import styles from 'styles.module.css'
 
 export default function ImageGallery ({pictures}) {

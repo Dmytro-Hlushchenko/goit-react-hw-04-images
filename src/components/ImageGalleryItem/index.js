@@ -1,1 +1,1 @@
-export {default} from "./ImageGalleryItem.jsx"
+export {ImageGalleryItem} from "./ImageGalleryItem.jsx"
