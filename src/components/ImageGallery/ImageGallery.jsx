@@ -12,7 +12,6 @@ export default function ImageGallery ({pictures}) {
           picture={item}>
         </ImageGalleryItem>))
         }
-        
     </ul>
   )
-  };
+};

@@ -1,90 +1,75 @@
 import styles from 'styles.module.css'
 import React from "react";
-import { Component } from "react";
+import { useState, useEffect } from "react";
 import Searchbar from "./Searchbar";
 import ImageGallery from "./ImageGallery";
 import { getPictures } from "API";
 import  Button  from "./Button";
 import Loader from './Loader';
 
+export const App = () => {
 
-export class App extends Component {
+    const [isErrore, setErrore] = useState(false);
+    const [isPictures, setPictures] = useState([]);
+    const [isLoading, setLoading] = useState(false);
+    const [isLoadMore, setLoadMore] = useState(false);
+    const [isSearch, setSearch] = useState('');
+    const [isPage, setPage] = useState(1);
 
-state = {
-  errore: false,
-  pictures: [],
-  isLoading: false,
-  loadMore: false,
-  search:'',
-  page: 1,
-}
-
-async componentDidUpdate(prevProps, prevState){
-      
-        if (prevState.search !== this.state.search || 
-            prevState.page !== this.state.page) {
-          this.setState({isLoading: true})
-          
-          const {page, search} = this.state
-
-          try {
-          const pictures = await getPictures(search, page);
-            
-            this.setState(prevState => ({
-              pictures: [...prevState.pictures, ...pictures.hits],
-              loadMore: page < Math.ceil(pictures.totalHits / 12),
-            }));
-      
+    useEffect(() => {
+        if (isSearch === '') {
+            return
+         }
+        async function getSearch() {
+            try {
+                setLoading(true);
+                setErrore(false);
+                const pictures = await getPictures(isSearch, isPage);
+                setPictures(prevState => [...prevState, ...pictures.hits]);
+                setLoadMore(isPage < Math.ceil(pictures.totalHits / 12));
+                  
           } catch(error) {
-            this.setState({
-              error: true,
-            });
+            setErrore(true)
           }
           
           finally {
-              this.setState({isLoading: false})
+              setLoading(false)
             }
-        }
-      }
 
-onSubmit = query => {
-      this.setState({
-      search: query ,
-      pictures: [],
-      page:1,
-  });
-  };
+        };
+        getSearch();
+    }, [isSearch, isPage]);
 
-  
-onLoadMore = () => {
-  this.setState(prevState => ({
-    page: prevState.page + 1,
-  }));
-}
+    const onSubmit = query => {
+        setSearch(query);
+        setPictures([]);
+        setPage(1);
+    }
 
-render() {
-  const {isLoading, error, loadMore} = this.state;
+    const onLoadMore = () => {
+        setPage(prevState => prevState +1);
+    }
 
-    return(
-      <div className={styles.App}>
-        <Searchbar 
-          onSearchBtn = {this.onSubmit}>
-        </Searchbar>
 
-          {isLoading &&<Loader></Loader> }
-          {error && <b>Errore..try reload page.....</b>}
+    return (
+        <div className={styles.App}>
+            <Searchbar
+                onSearchBtn={onSubmit}>
+            </Searchbar>
+
+            {isLoading && <Loader></Loader>}
+            {isErrore && <b>Errore..try reload page.....</b>}
         
-        <ImageGallery 
-          pictures = {this.state.pictures}
-        >
-        </ImageGallery>
+            <ImageGallery
+                pictures={isPictures}
+            >
+            </ImageGallery>
 
-        {loadMore && (
-          <Button
-            onClick={this.onLoadMore}>
-          </Button>
-        )}       
-      </div>
-    ) 
-  }
+            {isLoadMore && (
+                <Button
+                    onClick={onLoadMore}>
+                </Button>
+            )}
+        </div>
+    );
 };
