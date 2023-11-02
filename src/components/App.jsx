@@ -9,24 +9,24 @@ import Loader from './Loader';
 
 export const App = () => {
 
-    const [isErrore, setErrore] = useState(false);
-    const [isPictures, setPictures] = useState([]);
-    const [isLoading, setLoading] = useState(false);
-    const [isLoadMore, setLoadMore] = useState(false);
-    const [isSearch, setSearch] = useState('');
-    const [isPage, setPage] = useState(1);
+    const [errore, setErrore] = useState(false);
+    const [pictures, setPictures] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [loadMore, setLoadMore] = useState(false);
+    const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
-        if (isSearch === '') {
+        if (search === '') {
             return
          }
         async function getSearch() {
             try {
                 setLoading(true);
                 setErrore(false);
-                const pictures = await getPictures(isSearch, isPage);
+                const pictures = await getPictures(search, page);
                 setPictures(prevState => [...prevState, ...pictures.hits]);
-                setLoadMore(isPage < Math.ceil(pictures.totalHits / 12));
+                setLoadMore(page < Math.ceil(pictures.totalHits / 12));
                   
           } catch(error) {
             setErrore(true)
@@ -38,7 +38,7 @@ export const App = () => {
 
         };
         getSearch();
-    }, [isSearch, isPage]);
+    }, [search, page]);
 
     const onSubmit = query => {
         setSearch(query);
@@ -57,15 +57,15 @@ export const App = () => {
                 onSearchBtn={onSubmit}>
             </Searchbar>
 
-            {isLoading && <Loader></Loader>}
-            {isErrore && <b>Errore..try reload page.....</b>}
+            {loading && <Loader></Loader>}
+            {errore && <b>Errore..try reload page.....</b>}
         
             <ImageGallery
-                pictures={isPictures}
+                pictures={pictures}
             >
             </ImageGallery>
 
-            {isLoadMore && (
+            {loadMore && (
                 <Button
                     onClick={onLoadMore}>
                 </Button>
